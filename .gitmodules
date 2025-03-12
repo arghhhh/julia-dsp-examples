@@ -1,3 +1,6 @@
 [submodule "git-submodules/julia-signals-systems"]
 	path = git-submodules/julia-signals-systems
 	url = git@github.com:arghhhh/julia-signals-systems.git
+[submodule "git-submodules/julia-fixed-point"]
+	path = git-submodules/julia-fixed-point
+	url = git@github.com:arghhhh/julia-fixed-point.git
