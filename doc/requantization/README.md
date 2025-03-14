@@ -1,9 +1,9 @@
 
 I recently came across this paper:
 
-Truncation noise in fixed-point SFGs
-G.A. Constantinides, P.Y.K. Cheung, and W. Luk
-Electronics Letters Volume 35, Issue 23
+# Truncation noise in fixed-point SFGs
+### G.A. Constantinides, P.Y.K. Cheung, and W. Luk
+### Electronics Letters Volume 35, Issue 23, 11th November 1999
 https://doi.org/10.1049/el:19991375
 
 It is interesting in that it claims an improved model of truncation noise in fixed-point signal processing.  This is a pretty basic concept that is taught in every DSP class.  It is very simple concept covering the quantization of signals that are already quantized. Their presentation makes is slightly more complex than necessary - maybe in an attempt to make it publishable as new work in 1999!
