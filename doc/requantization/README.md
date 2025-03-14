@@ -34,7 +34,7 @@ This model takes into account the number of bits being truncated ($q$), by reduc
 For example, if two bits are being truncated, the possible values of the truncated LSBs are 
 $\{00, 01, 10, 11\}$ representing values of 0, 
 $\{ 0, - \frac{1}{4}, - \frac{1}{2}, - \frac{3}{4} \} $.
-Thus the error, $e$ is bounded by $ -\frac{3}{4} <= e <= 0 $
+Thus the error, $e$ is bounded by $-\frac{3}{4} \leq e \leq 0$
 and this range is used as for the simplified model.  
 
 ### 3. The Proposed Model
