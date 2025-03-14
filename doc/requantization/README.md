@@ -32,7 +32,7 @@ From here on, the number of bits being truncated is denoted by $q$.  The input t
 ### 2. The Unsimplified Model
 This model takes into account the number of bits being truncated ($q$), by reducing the width of the continuous PDF.
 For example, if two bits are being truncated, the possible values of the truncated LSBs are 
-$\{00, 01, 10, 11\}$ representing values of 0, 
+$\{00, 01, 10, 11\}$ representing values of  
 $\{ 0, - \frac{1}{4}, - \frac{1}{2}, - \frac{3}{4} \} $.
 Thus the error, $e$ is bounded by $-\frac{3}{4} \leq e \leq 0$
 and this range is used as for the simplified model.  
