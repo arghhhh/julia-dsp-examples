@@ -12,6 +12,7 @@ add_to_Julia_path( "../git-submodules/julia-signals-systems/src/Sequences" )
 add_to_Julia_path( "../git-submodules/julia-signals-systems/src/Processors" )
 add_to_Julia_path( "../git-submodules/julia-signals-systems/src/ProcSeqs" )
 add_to_Julia_path( "../git-submodules/julia-signals-systems/src/SNR" )
+add_to_Julia_path( "../git-submodules/julia-signals-systems/src/DSPfns" )
 
 add_to_Julia_path( "../git-submodules/julia-fixed-point" )
 
