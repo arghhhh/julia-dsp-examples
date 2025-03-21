@@ -79,7 +79,7 @@ plot!( legend=:right )
 # Also p412 top 
 #   2^-b1 << 2^-b  so 2^-b1 can be ignored
 
-# Constantinides, Cheung & Luk paper (Eletcronics Letters 11th Nov 1999, Vol 35, No.23)
+# Constantinides, Cheung & Luk paper (Electronics Letters 11th Nov 1999, Vol 35, No.23)
 # They take the bounds for the truncation error developed in the Oppenheim & Schafer book
 # and applies it to the uniformly continuously distributed variance expression (1/12*lsb)
 # also developed in that book - but I could not see anywhere where Oppenheim & Schafer 
