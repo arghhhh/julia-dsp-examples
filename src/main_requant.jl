@@ -93,3 +93,22 @@ plot!( xlabel="Number of bits truncated" )
 plot!( ylabel="Mean & variance relative to the output LSB size" )
 
 savefig( "requantization.svg" )
+
+
+scatter( log2.(Ns1), [ requant_error_mean.(Ns1) requant_error_var.(Ns1)   ]
+, layout = (2,1)
+,   ylabel = [ "mean" "var"  ]
+, xlabel = [ "" "Number of truncated bits" ]
+, legend = nothing )
+
+ys = 1/12 * [ 0, 1, 1, 1, 1, 1, 1 ]
+scatter( log2.(Ns1),  ys, marker=:square, markercolor=:white , markersize=6, label="Hogenauer Equation(13)")  
+
+scatter!( log2.(Ns1),  requant_error_var.(Ns1)  
+,   ylabel =  "variance at output" 
+, xlabel = "Number of fractional bits that are truncated"
+, label = "Constantinides, Cheung & Luk" )
+
+
+plot!( dpi=300 )
+savefig( "requant-variance.png" )

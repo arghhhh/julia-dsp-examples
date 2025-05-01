@@ -6,6 +6,8 @@ import FFTW
 
 import DSPfns
 
+import Test
+
 function fast_convolution( x, h )
         # x already assumed to be sufficiently padded
 
@@ -156,10 +158,7 @@ y2 = x |> sys2 |> collect
 # calculate each set of L output values
 
 h = [1,2,3,4]
-h = rand( 1:10, 50 )
 
-L = 8
-M = length(h)
 
 impulse = [ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -177,28 +176,32 @@ end
 overlapsave( vlen, L ) = Processors.Vectorize(vlen) |> Processors.Downsample(L,L-1)
 
 
-sys1 = (
-           overlapsave( L+M-1, L )
-        |> Processors.MapT{Vector{Int}}( x->DSPfns.conv(x,h) )
-        |> Processors.MapT{Vector{Int}}( x->x[M:M+L-1] )  # pull out the L good samples
-        |> Processors.Serialize()
-        )
-sys2 = (
-        overlapsave( L+M-1, L )
-        |> FastConvolution(h)
-        |> Processors.MapT{Vector{Float64}}( x->x[M:M+L-1] ) # pull out the L good samples
-        |> Processors.Serialize()
-        )
-xs = rand( 0:10, 2000 )
+test_overlapsave_fastconv( xs, h, L ) = begin
 
-y0 = DSPfns.conv( xs, h )
+        M = length(h)
 
-y1 = xs |> sys1 |> collect
-y2 = xs |> sys2 |> collect
+        sys1 = (
+                overlapsave( L+M-1, L )
+                |> Processors.MapT{Vector{Int}}( x->DSPfns.conv(x,h) )
+                |> Processors.MapT{Vector{Int}}( x->x[M:M+L-1] )  # pull out the L good samples
+                |> Processors.Serialize()
+                )
+        sys2 = (
+                overlapsave( L+M-1, L )
+                |> FastConvolution(h)
+                |> Processors.MapT{Vector{Float64}}( x->x[M:M+L-1] ) # pull out the L good samples
+                |> Processors.Serialize()
+                )
 
-@show length(y1) M L
+        y0 = DSPfns.conv( xs, h )
 
-@assert maximum( abs.( y1 - y2 ) ) < 1e-10
+        y1 = xs |> sys1 |> collect
+        y2 = xs |> sys2 |> collect
+
+        @show length(y1) M L
+
+        @Test.test maximum( abs.( y1 - y2 ) ) < 1e-10
+end
 
 
 # error("stop")
@@ -244,45 +247,85 @@ zeropad( v, n ) = begin
         return y
 end
 
-sys1 = 
-        (  Processors.SlidingWindow(L) 
-        |> Processors.Downsample(L) 
-        |> Processors.MapT{Vector{Int}}( x->DSPfns.conv(x,h) )
-    #    |> Reshape(L)
-    #    |> Processors.Delays2()
-    #    |> Sum()
-        |> overlapadd(L)
-        |> Processors.Serialize()
-        )
-sys2 = 
-        (  Processors.SlidingWindow(L) 
-        |> Processors.Downsample(L) 
-        |> Processors.MapT{Vector{Int}}( x->zeropad(x,2M-2) )
-        |> FastConvolution(h)
-    #    |> Reshape(L)
-    #    |> Processors.Delays2()
-    #    |> Sum()
-        |> overlapadd(L)
-        |> Processors.Serialize()
-        )
-y0 = DSPfns.conv( xs, h )[1:length(xs)]
+test_overlapadd_fastconv( xs, h, L ) = begin
 
-y1 = xs |> sys1 |> collect
-y2 = xs |> sys2 |> collect
+        M = length(h)
 
-@show length(y1) M L
-@assert y1 == y0[1:length(y1)]
-#@assert y2 == y1
-@assert maximum( abs.( y1 - y2 ) ) < 1e-10
-@assert maximum( abs.( y1 - y0 ) ) < 1e-10
-@assert maximum( abs.( y2 - y0 ) ) < 1e-10
-        
+        sys1 = 
+                (  Processors.SlidingWindow(L) 
+                |> Processors.Downsample(L) 
+                |> Processors.MapT{Vector{Int}}( x->DSPfns.conv(x,h) )
+        #    |> Reshape(L)
+        #    |> Processors.Delays2()
+        #    |> Sum()
+                |> overlapadd(L)
+                |> Processors.Serialize()
+                )
+        sys2 = 
+                (  Processors.SlidingWindow(L) 
+                |> Processors.Downsample(L) 
+                |> Processors.MapT{Vector{Int}}( x->zeropad(x,2M-2) )
+                |> FastConvolution(h)
+        #    |> Reshape(L)
+        #    |> Processors.Delays2()
+        #    |> Sum()
+                |> overlapadd(L)
+                |> Processors.Serialize()
+                )
+        y0 = DSPfns.conv( xs, h )[1:length(xs)]
+
+        y1 = xs |> sys1 |> collect
+        y2 = xs |> sys2 |> collect
+
+        @show length(y1) M L
+        @assert y1 == y0[1:length(y1)]
+        #@assert y2 == y1
+        @Test.test maximum( abs.( y1 - y2 ) ) < 1e-10
+        @Test.test maximum( abs.( y1 - y0 ) ) < 1e-10
+        @Test.test maximum( abs.( y2 - y0 ) ) < 1e-10
+end
+ 
+
+M = length(h)
+
+@Test.testset begin
+
+        h = rand( 1:10, 50 )
+        L = 8
+        xs = rand( 0:10, 2000 )
+
+        test_overlapsave_fastconv( xs, h, L )
+        test_overlapadd_fastconv(  xs, h, L )
+
+        L = 50
+        h = rand( 1:10,10 )
+
+        test_overlapsave_fastconv( xs, h, L )
+        test_overlapadd_fastconv(  xs, h, L )
+
+
+        L = 100
+        h = rand( 1:10,5 )
+
+        test_overlapsave_fastconv( xs, h, L )
+        test_overlapadd_fastconv(  xs, h, L )
+
+        L = 1000
+        h = rand( 1:10,500 )
+        xs = rand( 0:10, 10000 )
+
+        test_overlapsave_fastconv( xs, h, L )
+        test_overlapadd_fastconv(  xs, h, L )
+
+
+end
+
 
 
     #    xs |> sys |> Sequences.info
 
 
 
-nothing
+#nothing
 
 

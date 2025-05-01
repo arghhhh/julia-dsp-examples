@@ -42,3 +42,22 @@ end
 function Base.eltype( ::Type{ Processors.Apply{I,Round{T}} }) where {I,T} 
         return T
 end
+
+
+#--------------------------------------------------------------------------------
+
+# TODO: move image and alias somewhere more appropriate.
+
+"Determine the frequency of the (i)th image of frequency f with sample rate fs"
+function image( i, f, fs )
+        @assert f <= fs/2 "input frequency should be in range 0..fs/2"
+        add = iseven(i)
+        mult = div( i+1, 2 )
+        return mult * fs + (add ? f : -f )
+end
+
+"Determine what frequency f will alias to when sampled at fs"
+function alias( f, fs )
+        f1 = mod( f, fs )
+        return f1 > fs/2 ? fs-f1 : f1
+end
